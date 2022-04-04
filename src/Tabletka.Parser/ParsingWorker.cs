@@ -40,7 +40,9 @@ public class ParsingWorker : BackgroundService
     {
         using var client = _httpClientFactory.CreateClient("Default");
         var results = new List<Result>();
-        foreach (var item in _medicineOptions.Value.Items)
+        var medicines = _medicineOptions.Value.Items
+            .Distinct();
+        foreach (var item in medicines)
         {
             try
             {
