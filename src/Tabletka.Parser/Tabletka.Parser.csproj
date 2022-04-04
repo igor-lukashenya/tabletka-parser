@@ -4,6 +4,11 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-Tabletka.Parser-4F43ACF9-49D4-4AAF-B760-8F1CD8950017</UserSecretsId>
+        <Authors>Igor Lukashenya, Viki Lukashenya</Authors>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+        <PackageProjectUrl>https://github.com/igor-lukashenya/tabletka-parser</PackageProjectUrl>
+        <ApplicationIcon>Resources\pills.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
