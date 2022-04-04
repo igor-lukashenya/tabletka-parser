@@ -9,6 +9,7 @@
         <FileVersion>1.0.0</FileVersion>
         <PackageProjectUrl>https://github.com/igor-lukashenya/tabletka-parser</PackageProjectUrl>
         <ApplicationIcon>Resources\pills.ico</ApplicationIcon>
+        <Product>Tabletka Parser</Product>
     </PropertyGroup>
 
     <ItemGroup>
