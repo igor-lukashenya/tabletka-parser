@@ -1,23 +1,30 @@
 using Microsoft.Extensions.Options;
-using Tabletka.Parser;
 using Tabletka.Parser.Options;
+using Tabletka.Parser.Parsers;
+using Tabletka.Parser.Parsers.Abstractions;
+using Tabletka.Parser.Services;
+using Tabletka.Parser.Services.Abstractions;
+using Tabletka.Parser.Workers;
 
-var host = Host.CreateDefaultBuilder(args)
+await Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, collection) =>
     {
-        collection.Configure<ApiOptions>(context.Configuration);
-        collection.Configure<MedicineOptions>(context.Configuration);
-        collection.Configure<ExportOptions>(context.Configuration);
-        
-        collection.AddHttpClient("Default", (provider, client)  =>
+        collection.Configure<ApiOptions>(context.Configuration.GetSection("Api"));
+        collection.Configure<MedicineOptions>(context.Configuration.GetSection("Medicine"));
+        collection.Configure<ExportOptions>(context.Configuration.GetSection("Export"));
+
+        collection.AddHttpClient("Default", (provider, client) =>
         {
             var apiOptions = provider.GetRequiredService<IOptions<ApiOptions>>();
             client.BaseAddress = new Uri(apiOptions.Value.BaseAddress);
         });
-        
+
+        collection.AddTransient<IHtmlParser, HtmlParser>();
+        collection.AddTransient<IExportService, ExportService>();
+        collection.AddTransient<IMedicinesService, MedicinesService>();
+
         collection.AddHostedService<ParsingWorker>();
     })
     .UseConsoleLifetime()
-    .Build();
-
-await host.RunAsync();
+    .Build()
+    .RunAsync();

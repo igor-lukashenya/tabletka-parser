@@ -1,6 +1,8 @@
-﻿namespace Tabletka.Parser.Options;
+﻿using Tabletka.Parser.Models;
+
+namespace Tabletka.Parser.Options;
 
 public class MedicineOptions
 {
-    public string[] Items { get; set; }
+    public RequiredMedicineList[] Lists { get; set; }
 }

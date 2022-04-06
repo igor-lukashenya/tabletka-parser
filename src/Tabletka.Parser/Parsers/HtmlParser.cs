@@ -1,18 +1,24 @@
 ﻿using System.Text.RegularExpressions;
 using HtmlAgilityPack;
+using Tabletka.Parser.Models;
+using Tabletka.Parser.Parsers.Abstractions;
 
-namespace Tabletka.Parser.Models;
+namespace Tabletka.Parser.Parsers;
 
-public class Result
+public class HtmlParser : IHtmlParser
 {
-    public string Name { get; set; }
-    public string Form { get; set; }
-    public string Produce { get; set; }
-    public string MinPrice { get; set; }
-    public string MaxPrice { get; set; }
-    public DateOnly Date { get; set; }
+    public IEnumerable<Medicine> Parse(string html)
+    {
+        var htmlDocument = new HtmlDocument();
+        htmlDocument.LoadHtml(html);
+        var table = htmlDocument.GetElementbyId("base-select");
+        return table.Descendants("tr")
+            .Where(r => r.HasClass("tr-border"))
+            .Select(ParseRow)
+            .ToList();
+    }
 
-    public static Result Create(HtmlNode row, DateOnly date)
+    private static Medicine ParseRow(HtmlNode row)
     {
         var price = row.Descendants("td")
             .FirstOrDefault(td => td.HasClass("price"))?
@@ -23,7 +29,7 @@ public class Result
         var prices = !string.IsNullOrEmpty(price)
             ? Regex.Matches(price, @"\d+.\d+").Select(match => match.Value).ToArray()
             : new[] { "no price", "no price" };
-        return new Result
+        return new Medicine
         {
             Name = row.Descendants("td")
                 .FirstOrDefault(td => td.HasClass("name"))?
@@ -43,9 +49,8 @@ public class Result
                 .FirstOrDefault(div => div.HasClass("tooltip-info-header"))?
                 .InnerText.Trim(),
 
-            MinPrice = prices.First(),
-            MaxPrice = prices.Last(),
-            Date = date
+            MinPrice = decimal.TryParse(prices.First(), out var minPrice) ? minPrice : 0,
+            MaxPrice = decimal.TryParse(prices.Last(), out var maxPrice) ? maxPrice : 0
         };
     }
 }
