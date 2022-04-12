@@ -12,6 +12,7 @@ await Host.CreateDefaultBuilder(args)
         collection.Configure<ApiOptions>(context.Configuration.GetSection("Api"));
         collection.Configure<MedicineOptions>(context.Configuration.GetSection("Medicine"));
         collection.Configure<ExportOptions>(context.Configuration.GetSection("Export"));
+        collection.Configure<ParsingOptions>(context.Configuration.GetSection("Parsing"));
 
         collection.AddHttpClient("Default", (provider, client) =>
         {

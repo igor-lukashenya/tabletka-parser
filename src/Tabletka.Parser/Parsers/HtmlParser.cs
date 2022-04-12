@@ -1,12 +1,22 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Options;
 using Tabletka.Parser.Models;
+using Tabletka.Parser.Options;
 using Tabletka.Parser.Parsers.Abstractions;
 
 namespace Tabletka.Parser.Parsers;
 
 public class HtmlParser : IHtmlParser
 {
+    private readonly IOptions<ParsingOptions> _options;
+
+    public HtmlParser(IOptions<ParsingOptions> options)
+    {
+        _options = options;
+    }
+
     public IEnumerable<Medicine> Parse(string html)
     {
         var htmlDocument = new HtmlDocument();
@@ -18,8 +28,12 @@ public class HtmlParser : IHtmlParser
             .ToList();
     }
 
-    private static Medicine ParseRow(HtmlNode row)
+    private Medicine ParseRow(HtmlNode row)
     {
+        var culture = !string.IsNullOrWhiteSpace(_options.Value.Culture)
+            ? CultureInfo.GetCultureInfo(_options.Value.Culture)
+            : CultureInfo.CurrentCulture;
+
         var price = row.Descendants("td")
             .FirstOrDefault(td => td.HasClass("price"))?
             .Descendants("span")
@@ -49,8 +63,8 @@ public class HtmlParser : IHtmlParser
                 .FirstOrDefault(div => div.HasClass("tooltip-info-header"))?
                 .InnerText.Trim(),
 
-            MinPrice = decimal.TryParse(prices.First(), out var minPrice) ? minPrice : 0,
-            MaxPrice = decimal.TryParse(prices.Last(), out var maxPrice) ? maxPrice : 0
+            MinPrice = decimal.TryParse(prices.First(), NumberStyles.Number, culture, out var minPrice) ? minPrice : 0,
+            MaxPrice = decimal.TryParse(prices.Last(), NumberStyles.Number, culture, out var maxPrice) ? maxPrice : 0
         };
     }
 }
