@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using Tabletka.Parser;
 using Tabletka.Parser.Options;
 using Tabletka.Parser.Parsers;
 using Tabletka.Parser.Parsers.Abstractions;
@@ -9,12 +10,12 @@ using Tabletka.Parser.Workers;
 await Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, collection) =>
     {
-        collection.Configure<ApiOptions>(context.Configuration.GetSection("Api"));
-        collection.Configure<MedicineOptions>(context.Configuration.GetSection("Medicine"));
-        collection.Configure<ExportOptions>(context.Configuration.GetSection("Export"));
-        collection.Configure<ParsingOptions>(context.Configuration.GetSection("Parsing"));
+        collection.Configure<ApiOptions>(context.Configuration.GetSection(ApiOptions.Section));
+        collection.Configure<MedicineOptions>(context.Configuration.GetSection(MedicineOptions.Section));
+        collection.Configure<ExportOptions>(context.Configuration.GetSection(ExportOptions.Section));
+        collection.Configure<ParsingOptions>(context.Configuration.GetSection(ParsingOptions.Section));
 
-        collection.AddHttpClient("Default", (provider, client) =>
+        collection.AddHttpClient(HttpClients.Tabletka, (provider, client) =>
         {
             var apiOptions = provider.GetRequiredService<IOptions<ApiOptions>>();
             client.BaseAddress = new Uri(apiOptions.Value.BaseAddress);

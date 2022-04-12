@@ -23,7 +23,7 @@ public class MedicinesService : IMedicinesService
     {
         try
         {
-            using var client = _httpClientFactory.CreateClient("Default");
+            using var client = _httpClientFactory.CreateClient(HttpClients.Tabletka);
             var response = await client.GetAsync($"/search?request={requiredMedicine.Name}&region=1001", stoppingToken);
             var content = await response.Content.ReadAsStringAsync(stoppingToken);
             var medicines = _htmlParser.Parse(content);
